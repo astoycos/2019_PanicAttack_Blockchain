@@ -9,3 +9,10 @@ The purpose of this project is to use a combination of sensors in order to deter
 -Flash the AnyLedger sample to the FRDM board
 -Setup networking on FRDM board(?) to connect to blockchain
 -Run tests and debugging
+
+## Setting up I2C_0 on the FRDM Board Using Zephyr
+In the i2c/zephyr_repo_config/ folder. There are two files in the folder:
+1) frdm_k64f_defconfig
+2) kconfig.defconfig
+These files are needed when building Zephyr OS in order to enable I2C_0.
+After cloning the Zephyr repo, these files need to be put in the zephyr\boards\arm\frdm_k64f\ folder before building the OS.
