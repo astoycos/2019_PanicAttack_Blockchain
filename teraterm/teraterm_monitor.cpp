@@ -13,11 +13,15 @@ int main()
         while (true)
         {
             //Get line if possible
+            bool header_removed = false;
             if (std::getline(ifs,line)) {
                 //Remove old data file and make a new one
                 remove( "data.txt" );
                 std::ofstream ofs("data.txt", ios::app);
-                if (line != "\n" && line != "") {
+                // if (line == "***** Booting Zephyr OS zephyr-v1.14.0-117-g83de530d5a36 *****") {
+                    // std::cout << "header\n";
+                // }
+                if (line != "\n" && line != "" && line != "***** Booting Zephyr OS zephyr-v1.14.0-117-g83de530d5a36 *****") {
                     std::cout << line << "\n";
                     ofs << line << "\n";
                 }
@@ -40,6 +44,5 @@ int main()
             sleep(1);
         }
     }
-
     return 0;
 }
