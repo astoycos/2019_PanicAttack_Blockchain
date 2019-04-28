@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 
+
 int main()
 {
     std::ifstream ifs("teraterm.log");
@@ -25,16 +26,15 @@ int main()
                     ofs << line << "\n";
                     }
                 }
+                std::system("./test_secondfunction");
+                std::cout << "Done\n"; 
             }
             
             if (!ifs.eof()) {
                 break;
             } // Ensure end of read was EOF.
             ifs.clear();
-            sleep(5);
-            //remove( "data.txt" );
-            // You may want a sleep in here to avoid
-            // being a CPU hog.
+            sleep(1);
         }
     }
 
