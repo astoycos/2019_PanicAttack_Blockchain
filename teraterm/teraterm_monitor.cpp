@@ -11,6 +11,7 @@ int main()
         while (true)
         {
             if (std::getline(ifs,line)) {
+                remove( "data.txt" );
                 std::ofstream ofs("data.txt", ios::app);
                 if (line != "\n" && line != "") {
 
@@ -31,7 +32,7 @@ int main()
             } // Ensure end of read was EOF.
             ifs.clear();
             sleep(5);
-            remove( "data.txt" );
+            //remove( "data.txt" );
             // You may want a sleep in here to avoid
             // being a CPU hog.
         }
