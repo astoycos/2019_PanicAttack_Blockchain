@@ -8,15 +8,12 @@
 #include <device.h>
 #include <stdio.h>
 #include <time.h>
+//#include <adc.h>
 
-//i2c functions we will need to use from i2c.h
-// i2c_configure()
-// i2c_write()
-// i2c_read()
-// i2c_write_read()
 //west build -b frdm_k64f --build-dir temp_sensor_build samples\temp_sensor --> use this command to build in zephyrproject\zephyr folder
 
-#define I2C_DEV "I2C_0"
+#define I2C_DEV1 "I2C_0"
+
 //Si7021 Commands
 //Measure Relative Humidity, Hold Master Mode
 #define MEAS_RH_HOLD 0xE5
@@ -48,29 +45,14 @@
 #define SI7021_ADDR 0x40
 
 void main(void)
-{
-	//should this be done here?
-	//DEVICE_INIT(I2C_DEV, drv_name, init_fn, data, cfg_info, level, prio)
-	//init_fn -- address of init function of driver
-
-	struct device *i2c_dev;
-	
-	//return i2c_transfer(i2c_dev, &msgs[0], 2, FRAM_I2C_ADDR);
-	/*
-	 * @param dev Pointer to the device structure for the driver instance.
- * @param buf Memory pool that stores the retrieved data.
- * @param num_bytes Number of bytes to read.
- * @param addr Address of the I2C device being read.
- *
- * @retval 0 If successful.
- * @retval -EIO General input / output error.
- 
-static inline int i2c_read(struct device *dev, u8_t *buf,
-			   u32_t num_bytes, u16_t addr)
-*/
+{		
+	//TEMP SENSOR
 	//look for i2c device, if one is not found, print a message
-	i2c_dev = device_get_binding(I2C_DEV);
-	if (!i2c_dev) {
+	
+	struct device *i2c_dev1;
+
+	i2c_dev1 = device_get_binding(I2C_DEV1);
+	if (!i2c_dev1) {
 		printk("I2C: Device driver not found.\n");
 		return;
 	} else {
@@ -83,10 +65,10 @@ static inline int i2c_read(struct device *dev, u8_t *buf,
 		u8_t write_data_1[2];
 		write_data_1[0]= 0xFA;
 		write_data_1[1]= 0x0F; 
-		count = i2c_write(i2c_dev, &write_data_1[0], 2, SI7021_ADDR);
+		count = i2c_write(i2c_dev1, &write_data_1[0], 2, SI7021_ADDR);
 		//delay(100);
 		u8_t first_byte;
-		count = i2c_read(i2c_dev, &first_byte, 1, SI7021_ADDR);
+		count = i2c_read(i2c_dev1, &first_byte, 1, SI7021_ADDR);
 		//printk("count = %d\n", count);
 		printk("first byte = %d\n", first_byte);
 		
@@ -94,50 +76,54 @@ static inline int i2c_read(struct device *dev, u8_t *buf,
 		u8_t write_data_2[2];
 		write_data_2[0]= 0xFC;
 		write_data_2[1]= 0xC9; 
-		count = i2c_write(i2c_dev, &write_data_2[0], 2, SI7021_ADDR);
+		count = i2c_write(i2c_dev1, &write_data_2[0], 2, SI7021_ADDR);
 		//delay(100);
 		u8_t second_byte;
-		count = i2c_read(i2c_dev, &second_byte, 1, SI7021_ADDR);
+		count = i2c_read(i2c_dev1, &second_byte, 1, SI7021_ADDR);
 		//printk("count = %d\n", count);
 		printk("second byte = %d\n", second_byte);
 		
 		//firmware version
 		write_data_1[0]= 0x84;
 		write_data_1[1]= 0x89; 
-		count = i2c_write(i2c_dev, &write_data_1[0], 2, SI7021_ADDR);
+		count = i2c_write(i2c_dev1, &write_data_1[0], 2, SI7021_ADDR);
 		//delay(100);
 		u8_t firmware_version;
-		count = i2c_read(i2c_dev, &firmware_version, 1, SI7021_ADDR);
+		count = i2c_read(i2c_dev1, &firmware_version, 1, SI7021_ADDR);
 		//printk("count = %d\n", count);
 		printk("firmware_version = %d\n", firmware_version);
 		
-		//Make a measurment reading
-		u8_t temp_read_command = 0xF3;
-		//temp_read_command[0] = 0xF3;
-		count = i2c_write(i2c_dev, &temp_read_command, 1, SI7021_ADDR);
+		u8_t temp_read_command = MEAS_TEMP_NO_HOLD;
+		u8_t humidity_read_command = MEAS_RH_HOLD;
 		u8_t temp_msb;
 		u8_t temp_lsb;
-		//delay(100);
-		u16_t temp;
-		k_sleep(1);
-		count = i2c_read(i2c_dev, &temp_msb, 1, SI7021_ADDR);
-		count = i2c_read(i2c_dev, &temp_lsb, 1, SI7021_ADDR);
-		temp = temp_msb << 8 | temp_lsb;
-		printk("temp = %d\n", temp);
-		
-		//Make a humidity reading
-		u8_t humidity_read_command = 0xE5;
-		//temp_read_command[0] = 0xF3;
-		count = i2c_write(i2c_dev, &humidity_read_command, 1, SI7021_ADDR);
 		u8_t humidity_msb;
 		u8_t humidity_lsb;
-		//delay(100);
+		u16_t temp;
 		u16_t humidity;
-		k_sleep(1);
-		count = i2c_read(i2c_dev, &humidity_msb, 1, SI7021_ADDR);
-		count = i2c_read(i2c_dev, &humidity_lsb, 1, SI7021_ADDR);
-		humidity = humidity_msb << 8 | humidity_lsb;
-		printk("humidity = %d\n", humidity);
+
+		
+		//Make a temperature reading
+		while (1) {
+			count = i2c_write(i2c_dev1, &temp_read_command, 1, SI7021_ADDR);
+			k_sleep(1);
+			count = i2c_read(i2c_dev1, &temp_msb, 1, SI7021_ADDR);
+			count = i2c_read(i2c_dev1, &temp_lsb, 1, SI7021_ADDR);
+			temp = temp_msb << 8 | temp_lsb;
+			temp = (((175.72 * temp)/65536) - 46.85)*1.8 + 32; //Fahrenheit
+			printk("%d, ", temp);
+			
+			//Make a humidity reading
+			count = i2c_write(i2c_dev1, &humidity_read_command, 1, SI7021_ADDR);
+			k_sleep(1);
+			count = i2c_read(i2c_dev1, &humidity_msb, 1, SI7021_ADDR);
+			count = i2c_read(i2c_dev1, &humidity_lsb, 1, SI7021_ADDR);
+			humidity = humidity_msb << 8 | humidity_lsb;
+			humidity = ((125*humidity)/65536) - 6;
+			printk("%d\n", humidity);
+			
+			k_sleep(5000);
+		}
 		
 	}
 }
