@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+// #include <sstream>
 
 
 int main()
@@ -10,31 +11,34 @@ int main()
     if (ifs.is_open())
     {
         std::string line;
+        //Set a counter to make a fresh text file with a new name every sample
+        int counter = 0;
         while (true)
         {
             //Get line if possible
             bool header_removed = false;
+
             if (std::getline(ifs,line)) {
-                //Remove old data file and make a new one
-                remove( "data.txt" );
-                std::ofstream ofs("data.txt", ios::app);
-                // if (line == "***** Booting Zephyr OS zephyr-v1.14.0-117-g83de530d5a36 *****") {
-                    // std::cout << "header\n";
-                // }
+                //Make filename to store line of data
+                char fileName[100];
+                sprintf(fileName, "data%d.txt", counter);
+                std::string fN = fileName;
+
+                //Increment counter afterwards
+                counter++;
+
+                std::ofstream ofs(fileName, ios::app);
+
+                //Ignore empty lines and header
                 if (line != "\n" && line != "" && line != "***** Booting Zephyr OS zephyr-v1.14.0-117-g83de530d5a36 *****") {
-                    std::cout << line << "\n";
                     ofs << line << "\n";
                 }
-                //Repeat for the rest of the lines
+                //If theres a header or empty line, may want to look at any trailing lines that have the data
                 while (std::getline(ifs, line)) {
                     if (line != "\n" && line != "") {
-                    std::cout << line << "\n";
                     ofs << line << "\n";
                     }
                 }
-                //System to go function (if needed)
-                //std::system("go run ../GO_blockchain/main.go");
-                std::cout << "Done\n"; 
             }
             // Break when EOF
             if (!ifs.eof()) {
