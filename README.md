@@ -17,5 +17,40 @@ After cloning the zephyr project repository according to the instructions in the
 
 
 ## Monitoring Script
+Make sure either teraterm or zoc are logging the serial data to a log that matches the file name in teraterm.java. Then run teraterm.java which will save data in the Blockchain's medicalData directory. 
 
 ## Blockchain
+
+1. Download GO
+	-https://golang.org/dl/
+
+2. Download IPFS 
+	- https://docs.ipfs.io/introduction/install/
+
+3. Download LibP2P
+	- Setup
+	The best way to get your code environment set up is to clone this entire library and write your code within it. You can     develop outside the environment they provide but it requires knowing how to work with gx. We’ll show you the easy way.        Assuming you already have Go installed:
+
+	go get -d github.com/libp2p/go-libp2p/...
+	navigate to the cloned directory from above
+	make
+	make deps
+	This gets you all the packages and dependencies you need from this repo through the gx package manager. Again, we don’t     like gx as it breaks a lot of Go convention (besides, why not just stick with go get?) but it’s worth the inconvenience to    use this otherwise nice library.
+
+	We’re going to develop inside the examples subdirectory. So let’s create a directory under examples called p2p with
+
+	mkdir ./examples/p2p
+	Then navigate to your new p2p folder and create a main.go file. We will be writing all our code in this file.
+
+3. IPFS Init (Only if you haven't initialized it yet) 
+
+4. IPFS daemon
+	- Starts IPFS Node 
+
+5. Start P2P network with terminal command 
+	- go run main.go -l 10000 -secio
+
+6. Follow instructions to open additional connections 
+
+You will see that the blockchain now contains all the data from the serial log, in individual textfiles connected to individual blocks. 
+
